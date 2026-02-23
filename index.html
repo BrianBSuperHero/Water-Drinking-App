@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<title>Hydrate — minimal water tracker</title>
+	<link rel="manifest" href="manifest.json">
+	<link rel="stylesheet" href="app.css?v=2">
+	<link rel="apple-touch-icon" href="icons/icon.svg">
+</head>
+<body>
+	<main class="app">
+		<header class="top">
+			<div class="title">
+				<h1>Hydrate</h1>
+				<div class="stats">
+					<div class="goal">Goal: <span id="goal">2000</span> ml</div>
+					<div class="today">Today: <span id="today">0</span> ml</div>
+				</div>
+			</div>
+			<div class="progress-wrap">
+				<svg id="progressRing" viewBox="0 0 120 120" width="72" height="72" aria-hidden="true">
+					<circle class="bg" cx="60" cy="60" r="50" fill="none" stroke-width="10"/>
+					<circle class="fg" cx="60" cy="60" r="50" fill="none" stroke-width="10" stroke-linecap="round"/>
+				</svg>
+				<div class="percent"><span id="percent"><span class="num">0</span></span>%</div>
+			</div>
+			<div class="actions">
+				<button id="logout" class="pill">Log out</button>
+			</div>
+		</header>
+
+		<section class="input">
+			<div class="quick presets" id="presets">
+				<!-- Preset buttons inserted by JS -->
+			</div>
+			<div class="manual">
+				<input id="amount" type="number" min="1" placeholder="Amount (ml)" />
+				<button id="addBtn" class="primary">Add</button>
+			</div>
+			<div class="presets-controls small">
+				<input id="newPreset" placeholder="Add preset (ml)" />
+				<button id="addPreset" class="primary">Add Preset</button>
+			</div>
+			<div id="quote" class="quote hidden"></div>
+		</section>
+
+		<nav class="tabs">
+			<button class="tab active" data-tab="feed">Feed</button>
+			<button class="tab" data-tab="friends">Friends</button>
+			<button class="tab" data-tab="profile">Profile</button>
+		</nav>
+
+		<section id="feed" class="panel">
+			<h2>Today</h2>
+			<ul id="entryList" class="entries"></ul>
+			<div class="history">
+				<h3>Last 7 days</h3>
+				<ul id="historyList" class="entries small"></ul>
+				<div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+					<div id="weeklyChart" class="weekly-chart" aria-hidden="false" style="flex:1"></div>
+					<button id="exportWeekCsv" class="pill small">Export week CSV</button>
+				</div>
+			</div>
+		</section>
+
+		<section id="friends" class="panel hidden">
+			<h2>Friends</h2>
+			<div class="friends-controls">
+				<div style="display:flex;gap:8px;align-items:center;">
+					<input id="friendSearch" placeholder="Search users by name" />
+					<button id="searchFriend">Search</button>
+				</div>
+				<div style="display:flex;gap:8px;margin-top:8px;align-items:center;">
+					<button id="exportMe">Export my data</button>
+					<button id="importMe">Import data</button>
+					<input id="importFile" type="file" accept="application/json" style="display:none" />
+				</div>
+			</div>
+
+			<div class="search-results">
+				<h3>Search results</h3>
+				<ul id="searchResults" class="friendsList"></ul>
+			</div>
+
+			<div class="pending-requests">
+				<h3>Pending requests</h3>
+				<ul id="pendingList" class="friendsList"></ul>
+			</div>
+
+			<div class="accepted-friends">
+				<h3>Friends</h3>
+				<ul id="acceptedFriends" class="friendsList"></ul>
+			</div>
+		</section>
+
+		<section id="profile" class="panel hidden">
+			<h2>Profile</h2>
+			<label>Display name
+				<input id="displayName" placeholder="Your name" />
+			</label>
+			<label>Daily goal (ml)
+				<input id="dailyGoal" type="number" min="0" />
+			</label>
+			<div class="reminders">
+				<h3>Reminders</h3>
+				<p class="small">Set reminder times (iOS PWAs cannot schedule background notifications reliably).</p>
+				<input id="reminderTime" type="time" />
+				<button id="addReminder">Add Reminder</button>
+				<ul id="reminderList" class="small"></ul>
+			</div>
+			<button id="saveProfile">Save</button>
+		</section>
+
+	</main>
+	<script src="env.js"></script>
+	<script type="module">
+		import './auth/checkAuth.js';
+		import { supabase } from './lib/supabase.js';
+		document.getElementById('logout').addEventListener('click', async ()=>{ await supabase.auth.signOut(); window.location.href='/auth/login.html'; });
+		import './app.js';
+	</script>
+</body>
+</html>
